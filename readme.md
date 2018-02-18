@@ -65,3 +65,12 @@ python3 src/egl/app.py
 
 ----
 # Containerization
+
+More to come...
+
+----
+# Freezing Requirements
+
+Please run the following command to freeze requirements in a consistent manner, when adding new modules to the project.
+
+`pip freeze | LC_COLLATE=C sort > requirements.txt`

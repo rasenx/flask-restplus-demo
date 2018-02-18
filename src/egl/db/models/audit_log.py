@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy.dialects.postgresql import UUID, JSON, TEXT
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy import Column, DateTime, String
+from sqlalchemy import Column, DateTime, String, ForeignKey
 from sqlalchemy import func
 
 from egl.db.base import Base
@@ -13,7 +13,7 @@ class AuditLog(Base):
 
     id = Column(UUID, default=uuid.uuid4, primary_key=True, nullable=False)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False, index=True)
-    user_id = Column(UUID, index=True, unique=False, nullable=True)
+    user_id = Column(UUID, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     username = Column(String, index=True, unique=False, nullable=True)
     action = Column(String, index=True, unique=False, nullable=True)
     description = Column(String, index=True, unique=False, nullable=True)

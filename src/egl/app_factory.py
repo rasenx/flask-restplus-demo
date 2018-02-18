@@ -7,11 +7,13 @@ from uuid import UUID
 
 from decouple import config
 from flask import Blueprint, Flask, jsonify
+from flask_login import LoginManager
 from flask_marshmallow import Marshmallow
 from requests import RequestException
 from werkzeug.contrib.fixers import ProxyFix
 
 from egl.api.v1 import api
+from egl.db.models import User
 from egl.db.sessions import db
 
 logger = logging.getLogger(__name__)
@@ -53,6 +55,13 @@ def app_factory():
     blueprint = Blueprint('v1', __name__, url_prefix='/api/v1')
     api.init_app(blueprint)
     app.register_blueprint(blueprint)
+
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.get(user_id)
 
     @app.after_request
     def after_request(response):
