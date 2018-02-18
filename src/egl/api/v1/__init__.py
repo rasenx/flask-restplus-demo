@@ -61,11 +61,8 @@ class Auditable:
 
         try:
             if self.has_request_context:
-                firstline = '{} {}'.format(request.method, request.url)
-
                 entity.url = request.url
-                entity.user_id = request.headers.get(Auditable.header_name_for_userid, None)
-                entity.username = request.headers.get(Auditable.header_name_for_username, None)
+                firstline = '{} {}'.format(request.method, request.url)
 
                 audit_request_bodies = config.get('AUDIT_REQUEST_BODIES', cast=bool)
                 if audit_request_bodies:
@@ -77,10 +74,7 @@ class Auditable:
                 message = "Audit Log: User: '{}' {}. Meta: {}"
                 message = message.format(entity.username, entity.action, entity.meta)
 
-                if self.running_tests:
-                    print(message)
-                else:
-                    logger.info(message)
+                logger.info(message)
 
         except Exception as e:
             logger.error(e)
