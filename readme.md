@@ -61,7 +61,15 @@ alembic upgrade head
 
 # launch locally
 python3 src/egl/app.py
+
 ```
+
+At this point the server is running, so you may exercise it accordingly (curl, wget, fetch, postman, swagger ui, etc.)
+
+----
+# Swagger UI
+
+Visit <http://0.0.0.0:5000/api/v1> in your browser.
 
 ----
 # Containerization
