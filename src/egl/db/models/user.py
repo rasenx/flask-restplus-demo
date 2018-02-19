@@ -16,7 +16,7 @@ class User(Base, UserMixin):
     id = Column(UUID, default=uuid.uuid4, primary_key=True, nullable=False)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False, index=True)
     updated_at = Column(DateTime(timezone=True), default=func.now(), nullable=False, index=True)
-    username = Column(String, index=True, unique=False, nullable=True)
+    email = Column(String, index=True, unique=True, nullable=False)
     password = Column(String, index=True, unique=False, nullable=True)
     meta = Column(JSON, default=MutableDict, nullable=True)
     active = Column(Boolean, default=True, nullable=False, index=True)

@@ -1,5 +1,3 @@
-import uuid
-
 from flask_restplus_patched import Parameters, ModelSchema
 from marshmallow import fields, post_load
 
@@ -65,3 +63,18 @@ class UserPageSchema(PageSchema):
     @post_load
     def deserialize(self, data):
         return PageItems(**data)
+
+
+class Login:
+    def __init__(self, **kwargs):
+        self.email = kwargs.get('email')
+        self.password = kwargs.get('password')
+
+
+class LoginSchema(Parameters):
+    email = fields.String(required=True, example='jdoe@example.com')
+    password = fields.String(required=True, example='correct horse battery staple')
+
+    @post_load
+    def deserialize(self, data):
+        return Login(**data)

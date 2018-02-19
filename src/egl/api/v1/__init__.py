@@ -50,10 +50,10 @@ class Auditable:
         If an http request object is present, the current request will be logged.
         """
 
-        user = db.session.query(User).get(current_user.get_id())
+        # user = db.session.query(User).get(current_user.get_id())
 
         entity = AuditLog()
-        entity.user_id = current_user
+        entity.user_id = current_user.id
         entity.username = current_user.username
         entity.action = action
         entity.description = description
@@ -64,7 +64,7 @@ class Auditable:
                 entity.url = request.url
                 firstline = '{} {}'.format(request.method, request.url)
 
-                audit_request_bodies = config.get('AUDIT_REQUEST_BODIES', cast=bool)
+                audit_request_bodies = config('AUDIT_REQUEST_BODIES', cast=bool)
                 if audit_request_bodies:
                     entity.request = '{}\n{}\n{}'.format(firstline, request.headers, request.data)
                 else:

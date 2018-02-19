@@ -34,6 +34,8 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+sqlalchemy_uri = env('SQLALCHEMY_DATABASE_URI')
+
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
@@ -47,9 +49,11 @@ def run_migrations_offline():
     script output.
 
     """
-    default = config.get_main_option("sqlalchemy.url")
-    url = env.get('SQLALCHEMY_DATABASE_URI', default)
-    context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
+    print('Running migrations offline. sqlalchemy.uri: {}'.format(sqlalchemy_uri))
+    context.configure(
+        url=sqlalchemy_uri,
+        target_metadata=target_metadata,
+        literal_binds=True)
 
     with context.begin_transaction():
         context.run_migrations()
@@ -62,12 +66,15 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
+    print('Running migrations online. sqlalchemy.uri: {}'.format(sqlalchemy_uri))
+
+    # ensure url is configured properly
     alembic_config = config.get_section(config.config_ini_section)
     if alembic_config.get('sqlalchemy.url') is None:
-        alembic_config['sqlalchemy.url'] = env.get('SQLALCHEMY_DATABASE_URI')
+        alembic_config['sqlalchemy.url'] = sqlalchemy_uri
 
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        alembic_config,
         prefix='sqlalchemy.',
         poolclass=pool.NullPool)
 

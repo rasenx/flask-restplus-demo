@@ -1,4 +1,5 @@
-from flask_restplus_patched import Resource, abort, Namespace
+from flask_restplus import Resource
+from flask_restplus_patched import Namespace
 
 from egl.api.v1.schemas import PagingParametersSchema, UserPageSchema
 from egl.api.v1.services import UserService

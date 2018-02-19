@@ -15,6 +15,8 @@ from werkzeug.contrib.fixers import ProxyFix
 from egl.api.v1 import api
 from egl.db.models import User
 from egl.db.sessions import db
+from egl.api.v1.authentication import ns as auth_namespace
+from egl.api.v1.users import ns as users_namespace
 
 logger = logging.getLogger(__name__)
 logger.setLevel('INFO')
@@ -42,7 +44,7 @@ def app_factory():
         os.environ['PROJECT_ROOT'] = project_root
 
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = config.get('SQLALCHEMY_DATABASE_URI')
+    app.config['SQLALCHEMY_DATABASE_URI'] = config('SQLALCHEMY_DATABASE_URI')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
     db.init_app(app)
@@ -54,6 +56,10 @@ def app_factory():
 
     blueprint = Blueprint('v1', __name__, url_prefix='/api/v1')
     api.init_app(blueprint)
+
+    api.add_namespace(auth_namespace, '/authentication')
+    api.add_namespace(users_namespace, '/users')
+
     app.register_blueprint(blueprint)
 
     login_manager = LoginManager()
@@ -75,7 +81,7 @@ def app_factory():
         Provide a default error handler for RestPlus to leverage.
         """
         logger.exception(e)
-        debug = config.get('FLASK_DEBUG')
+        debug = config('FLASK_DEBUG')
         if not debug:
             message = 'An unhandled exception occurred.'
             return {'message': message}, 500

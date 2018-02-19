@@ -10,10 +10,10 @@ app = app_factory()
 
 
 def main():
-    host = config.get('FLASK_HOST', '0.0.0.0')
-    port = int(config.get('FLASK_PORT', 5000))
-    debug = config.get('FLASK_DEBUG', True)
-    use_reloader = config.get('FLASK_USE_RELOADER', True)
+    host = config('FLASK_HOST', '0.0.0.0')
+    port = config('FLASK_PORT', 5000, cast=int)
+    debug = config('FLASK_DEBUG', True, cast=bool)
+    use_reloader = config('FLASK_USE_RELOADER', True, cast=bool)
     app.run(host=host, port=port, debug=debug, use_debugger=debug, use_reloader=use_reloader)
 
 

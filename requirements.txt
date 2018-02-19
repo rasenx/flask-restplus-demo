@@ -21,7 +21,9 @@ flask-restplus==0.10.1
 idna==2.6
 itsdangerous==0.24
 jsonschema==2.6.0
+marshmallow-sqlalchemy==0.13.2
 marshmallow==2.15.0
+psycopg2-binary==2.7.4
 pycparser==2.18
 python-dateutil==2.6.1
 python-decouple==3.1
