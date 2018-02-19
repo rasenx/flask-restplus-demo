@@ -13,6 +13,7 @@ from requests import RequestException
 from werkzeug.contrib.fixers import ProxyFix
 
 from egl.api.v1 import api
+from egl.api.v1.services import SeedDataService
 from egl.db.models import User
 from egl.db.sessions import db
 from egl.api.v1.authentication import ns as auth_namespace
@@ -46,6 +47,7 @@ def app_factory():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = config('SQLALCHEMY_DATABASE_URI')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+    app.secret_key = config('FLASK_SESSION_SECRET_KEY')
 
     db.init_app(app)
 
@@ -65,9 +67,13 @@ def app_factory():
     login_manager = LoginManager()
     login_manager.init_app(app)
 
+    with app.app_context():
+        seed_data = SeedDataService()
+        seed_data.seed()
+
     @login_manager.user_loader
     def load_user(user_id):
-        return User.get(user_id)
+        return User.query.get(user_id)
 
     @app.after_request
     def after_request(response):

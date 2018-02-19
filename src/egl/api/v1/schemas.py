@@ -55,6 +55,13 @@ class UserSchema(ModelSchema):
     class Meta:
         model = User
         strict = True
+        exclude = ['password']
+
+
+# alternatively you could inherit that schema and blacklist fields you don't want
+class CurrentUserSchema(UserSchema):
+    class Meta:
+        exclude = ['password']
 
 
 class UserPageSchema(PageSchema):
@@ -72,8 +79,8 @@ class Login:
 
 
 class LoginSchema(Parameters):
-    email = fields.String(required=True, example='jdoe@example.com')
-    password = fields.String(required=True, example='correct horse battery staple')
+    email = fields.String(required=True, example='minion@evilgeniuslabs.org')
+    password = fields.String(required=True, example='banana')
 
     @post_load
     def deserialize(self, data):

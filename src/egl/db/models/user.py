@@ -22,8 +22,11 @@ class User(Base, UserMixin):
     active = Column(Boolean, default=True, nullable=False, index=True)
 
     def change_password(self, password):
-        hashed = bcrypt.hashpw(password, bcrypt.gensalt())
-        self.password = hashed
+        password = password or ''
+
+        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        self.password = hashed.decode('utf-8')
 
     def check_password(self, password):
-        return bcrypt.checkpw(password, self.password)
+        password = password or ''
+        return bcrypt.checkpw(password.encode('utf8'), self.password.encode('utf-8'))
