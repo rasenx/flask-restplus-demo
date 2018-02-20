@@ -1,48 +1,33 @@
 import logging
 import os
-from datetime import datetime, date
-from decimal import Decimal
-from json import JSONEncoder
-from uuid import UUID
 
 from decouple import config
-from flask import Blueprint, Flask, jsonify
-from flask_login import LoginManager
+from flask import Blueprint, Flask, jsonify, Response, abort, g
+from flask_login import LoginManager, login_user, current_user
 from flask_marshmallow import Marshmallow
 from requests import RequestException
 from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.exceptions import Unauthorized
 
 from egl.api.v1 import api
+from egl.api.v1.authentication import ns as auth_namespace
 from egl.api.v1.services import SeedDataService
+from egl.api.v1.users import ns as users_namespace
+from egl.app_json_encoder import monkey_patch_json_encoder
+from egl.app_session import AppSessionInterface
 from egl.db.models import User
 from egl.db.sessions import db
-from egl.api.v1.authentication import ns as auth_namespace
-from egl.api.v1.users import ns as users_namespace
 
 logger = logging.getLogger(__name__)
 logger.setLevel('INFO')
-
-
-_encoder_default = JSONEncoder.default
-
-
-def _better_encoder_default(self, o):
-    if isinstance(o, Decimal) or isinstance(o, UUID):
-        return str(o)
-
-    if isinstance(o, datetime) or isinstance(o, date):
-        return o.isoformat()
-
-    return _encoder_default(self, o)
-
-
-JSONEncoder.default = _better_encoder_default
 
 
 def app_factory():
     project_root = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', '..'))
     if os.environ.get('PROJECT_ROOT', None) is None:
         os.environ['PROJECT_ROOT'] = project_root
+
+    monkey_patch_json_encoder()
 
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = config('SQLALCHEMY_DATABASE_URI')
@@ -58,11 +43,11 @@ def app_factory():
 
     blueprint = Blueprint('v1', __name__, url_prefix='/api/v1')
     api.init_app(blueprint)
-
     api.add_namespace(auth_namespace, '/authentication')
     api.add_namespace(users_namespace, '/users')
 
     app.register_blueprint(blueprint)
+    app.session_interface = AppSessionInterface()
 
     login_manager = LoginManager()
     login_manager.init_app(app)
@@ -74,6 +59,28 @@ def app_factory():
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(user_id)
+
+    @login_manager.request_loader
+    def load_user_from_request(request):
+        header = request.headers.get('Authorization')
+        if header is None:
+            abort(401)
+
+        header_value = header.split()
+        auth_type = header_value[0].lower()
+
+        if auth_type == 'bearer':
+            authenticated_bearer_token(header_value[1])
+
+        elif auth_type == 'basic':
+            creds = request.authorization
+            if creds is not None:
+                authenticate_basic(creds.username, creds.password)
+
+        if current_user is None:
+            raise Unauthorized()
+
+        g.authenticated_from_header = True
 
     @app.after_request
     def after_request(response):
@@ -111,3 +118,23 @@ def app_factory():
         return jsonify(error=500, text=str(e)), 500
 
     return app
+
+
+def authenticate_basic(username, password):
+    user = db.session.query(User).filter(User.email == username).one_or_none()
+    if user is None:
+        raise Unauthorized()
+
+    if user.check_password(password):
+        login_user(user)
+    else:
+        abort_with_challenge()
+
+
+def authenticated_bearer_token(token):
+    raise Unauthorized()
+
+
+def abort_with_challenge():
+    headers = {'WWW-Authenticate': 'Basic realm="Authentication Required"'}
+    abort(Response('Unauthorized, Authorization header required.', 401, headers))

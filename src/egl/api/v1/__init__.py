@@ -17,10 +17,18 @@ from egl.db.sessions import db
 logger = logging.getLogger(__name__)
 logger.setLevel('INFO')
 
+authorizations = {
+    'Basic': {
+        'type': 'basic'
+    }
+}
+
 api = Api(version='1',
           title='Flask Restplus Demo',
           description='REST APIs demonstrated by Evil Genius Labs.',
-          )
+          validate=True,
+          authorizations=authorizations,
+          security=['Basic'])
 
 paging_parameters = reqparse.RequestParser()
 paging_parameters.add_argument('page', default=1, type=int, help='Current page')
