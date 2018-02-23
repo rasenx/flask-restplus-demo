@@ -1,7 +1,7 @@
 from flask import jsonify
 from flask_login import login_required, current_user, logout_user, login_user
 from flask_restplus import Resource
-from flask_restplus_patched import Namespace
+from flask_restplus_patched import Namespace, abort
 from werkzeug.exceptions import Unauthorized
 
 from egl.api.v1.schemas import LoginSchema, UserSchema, CurrentUserSchema
@@ -38,7 +38,7 @@ class UsersResource(Resource):
             login_user(user)
             return user
 
-        return None
+        abort(401)
 
 
 @ns.route('/logout')

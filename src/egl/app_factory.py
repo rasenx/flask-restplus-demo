@@ -64,6 +64,13 @@ def app_factory():
     def load_user_from_request(request):
         header = request.headers.get('Authorization')
         if header is None:
+
+            # review how to whitelist end points that we know won't ever require authn/authz
+            # total hack, clean up with werkzeug or flask trimming, or our own method... this is super messy.
+            whitelist = ['/api/v1', '/api/v1?', '/api/v1/?', '/api/v1/swagger.json']
+            if request.full_path in whitelist:
+                return
+
             abort(401)
 
         header_value = header.split()
