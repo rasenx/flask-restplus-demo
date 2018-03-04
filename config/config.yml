@@ -1,6 +1,6 @@
 production:
   demo:
-    setting: production-value
+    setting: MOCK # secrets
 
 staging:
   demo:
