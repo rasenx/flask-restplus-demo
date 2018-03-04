@@ -15,6 +15,7 @@ from egl.api.v1.services import SeedDataService
 from egl.api.v1.users import ns as users_namespace
 from egl.app_json_encoder import monkey_patch_json_encoder
 from egl.app_session import AppSessionInterface
+from egl.configuration import Configuration
 from egl.db.models import User
 from egl.db.sessions import db
 
@@ -23,9 +24,20 @@ logger.setLevel('INFO')
 
 
 def app_factory():
+
+    # set project root
     project_root = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', '..'))
     if os.environ.get('PROJECT_ROOT', None) is None:
         os.environ['PROJECT_ROOT'] = project_root
+
+    # set config dir
+    config_dir = os.path.join(project_root, 'config')
+    if os.environ.get('CONFIG_DIR', None) is None:
+        os.environ['CONFIG_DIR'] = config_dir
+
+    # test out config
+    configuration = Configuration()
+    print(configuration.get('demo.setting'))
 
     monkey_patch_json_encoder()
 

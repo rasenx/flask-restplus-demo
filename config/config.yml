@@ -1,0 +1,11 @@
+production:
+  demo:
+    setting: production-value
+
+staging:
+  demo:
+    setting: staging-value
+
+development:
+  demo:
+    setting: dev-value

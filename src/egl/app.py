@@ -1,5 +1,7 @@
 # #!/usr/bin/env python
 import logging
+import sys
+
 from decouple import config
 from egl.app_factory import app_factory
 
@@ -18,4 +20,5 @@ def main():
 
 
 if __name__ == '__main__':
+    print(sys.path)
     main()
