@@ -1,11 +1,8 @@
 production:
-  demo:
-    setting: MOCK # secrets
-
-staging:
-  demo:
-    setting: staging-value
-
-development:
-  demo:
-    setting: dev-value
+  SQLALCHEMY_DATABASE_URI: postgresql:///flask-restplus-demo-db
+  FLASK_HOST: 0.0.0.0
+  FLASK_PORT: 5000
+  FLASK_DEBUG: True
+  FLASK_USE_RELOADER: True
+  FLASK_SESSION_SECRET_KEY: 'correct horse battery staple'
+  AUDIT_REQUEST_BODIES: False

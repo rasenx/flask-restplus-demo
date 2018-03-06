@@ -4,15 +4,13 @@ import logging
 # The swagger UI it exposes adds no value, so rather than monkey patching, just be careful what you import.
 # Original Commit: https://github.com/frol/flask-restplus-server-example/commit/e17bde52a287afa984d6d7eab3f1a63e5c377efe
 # --mark
-from decouple import config
 from flask import request
-from flask.globals import _request_ctx_stack, g
+from flask.globals import _request_ctx_stack
 from flask_login import current_user
 from flask_restplus_patched import Api, reqparse
 
-from egl.db.models import User
+from egl import config
 from egl.db.models.audit_log import AuditLog
-from egl.db.sessions import db
 
 logger = logging.getLogger(__name__)
 logger.setLevel('INFO')
@@ -72,7 +70,7 @@ class Auditable:
                 entity.url = request.url
                 firstline = '{} {}'.format(request.method, request.url)
 
-                audit_request_bodies = config('AUDIT_REQUEST_BODIES', cast=bool)
+                audit_request_bodies = config.get('AUDIT_REQUEST_BODIES')
                 if audit_request_bodies:
                     entity.request = '{}\n{}\n{}'.format(firstline, request.headers, request.data)
                 else:

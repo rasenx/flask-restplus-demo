@@ -6,7 +6,7 @@ import sys
 from logging.config import fileConfig
 
 from alembic import context
-from decouple import config as env
+from egl import config as env
 from sqlalchemy import engine_from_config, pool
 
 from egl.db.base import Base
@@ -34,7 +34,7 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-sqlalchemy_uri = env('SQLALCHEMY_DATABASE_URI')
+sqlalchemy_uri = env.get('SQLALCHEMY_DATABASE_URI')
 
 
 def run_migrations_offline():

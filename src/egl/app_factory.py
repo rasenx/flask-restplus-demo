@@ -1,7 +1,5 @@
 import logging
-import os
 
-from decouple import config
 from flask import Blueprint, Flask, jsonify, Response, abort, g
 from flask_login import LoginManager, login_user, current_user
 from flask_marshmallow import Marshmallow
@@ -9,13 +7,13 @@ from requests import RequestException
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.exceptions import Unauthorized
 
+from egl import config
 from egl.api.v1 import api
 from egl.api.v1.authentication import ns as auth_namespace
 from egl.api.v1.services import SeedDataService
 from egl.api.v1.users import ns as users_namespace
 from egl.app_json_encoder import monkey_patch_json_encoder
 from egl.app_session import AppSessionInterface
-from egl.configuration import Configuration
 from egl.db.models import User
 from egl.db.sessions import db
 
@@ -24,27 +22,12 @@ logger.setLevel('INFO')
 
 
 def app_factory():
-
-    # set project root
-    project_root = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', '..'))
-    if os.environ.get('PROJECT_ROOT', None) is None:
-        os.environ['PROJECT_ROOT'] = project_root
-
-    # set config dir
-    config_dir = os.path.join(project_root, 'config')
-    if os.environ.get('CONFIG_DIR', None) is None:
-        os.environ['CONFIG_DIR'] = config_dir
-
-    # test out config
-    configuration = Configuration()
-    print(configuration.get('demo.setting'))
-
     monkey_patch_json_encoder()
 
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = config('SQLALCHEMY_DATABASE_URI')
+    app.config['SQLALCHEMY_DATABASE_URI'] = config.get('SQLALCHEMY_DATABASE_URI')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-    app.secret_key = config('FLASK_SESSION_SECRET_KEY')
+    app.secret_key = config.get('FLASK_SESSION_SECRET_KEY')
 
     db.init_app(app)
 
@@ -113,7 +96,7 @@ def app_factory():
         Provide a default error handler for RestPlus to leverage.
         """
         logger.exception(e)
-        debug = config('FLASK_DEBUG')
+        debug = config.get('FLASK_DEBUG')
         if not debug:
             message = 'An unhandled exception occurred.'
             return {'message': message}, 500
