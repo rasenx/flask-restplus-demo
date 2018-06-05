@@ -12,4 +12,4 @@ class Permission(Base):
     id = Column(UUID, default=uuid.uuid4, primary_key=True)
     name = Column(String, nullable=False)
 
-    groups = relationship('UserGroup', secondary='user_group_permissions', back_populates='permissions')
+    # groups = relationship('UserGroup', secondary='user_group_permissions', back_populates='permissions')
