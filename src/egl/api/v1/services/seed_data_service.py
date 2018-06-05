@@ -29,7 +29,7 @@ class SeedDataService(Auditable):
         db.session.commit()
 
     def seed_user(self, user: User) -> User:
-        existing = db.session.query(User).get(user.id).first()
+        existing = db.session.query(User).get(user.id)
         if not existing:
             existing = db.session.query(User).filter(User.email == user.email).first()
             if not existing:
@@ -37,14 +37,14 @@ class SeedDataService(Auditable):
                 db.session.add(existing)
                 self.logger.info('Adding user: {}'.format(existing))
 
-        existing.email = user.email
-        existing.password = user.password
-        existing.meta = user.meta
-        existing.active = user.active
+        existing.email = user.email or existing.email
+        existing.password = user.password or existing.password
+        existing.meta = user.meta or existing.meta
+        existing.active = user.active or existing.active
         return existing
 
     def seed_group(self, group: UserGroup) -> UserGroup:
-        existing = db.session.query(UserGroup).get(group.id).first()
+        existing = db.session.query(UserGroup).get(group.id)
         if not existing:
             existing = group
             db.session.add(existing)
@@ -56,7 +56,7 @@ class SeedDataService(Auditable):
         return existing
 
     def seed_permission(self, permission: Permission) -> Permission:
-        existing = db.session.query(Permission).get(permission.id).first()
+        existing = db.session.query(Permission).get(permission.id)
         if not existing:
             existing = permission
             db.session.add(existing)

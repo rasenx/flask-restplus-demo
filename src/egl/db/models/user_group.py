@@ -17,7 +17,6 @@ class UserGroup(Base):
     name = Column(String, nullable=False)
     is_system_group = Column(Boolean, nullable=False, default=False)
 
-    members = relationship('User', secondary='user_group_members', back_populates='groups')
-    permissions = relationship('Permission', secondary='user_group_permissions', back_populates='groups')
-    children = relationship('UserGroup', lazy='joined', join_depth=1)
-    parent = relationship('UserGroup', back_populates='children', remote_side=[id], lazy='joined', join_depth=1)
+    members = relationship('User', secondary='user_group_members', backref='groups')
+    permissions = relationship('Permission', secondary='user_group_permissions', backref='groups')
+    parent = relationship('UserGroup', backref='children', remote_side=[id], lazy='joined', join_depth=1)
