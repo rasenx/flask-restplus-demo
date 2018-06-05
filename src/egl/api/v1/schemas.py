@@ -54,7 +54,7 @@ class PagingParametersSchema(Parameters):
 class UserSchema(ModelSchema):
     class Meta:
         model = User
-        strict = True
+        # strict = True
         exclude = ['password']
 
 

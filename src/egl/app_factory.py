@@ -47,9 +47,11 @@ def app_factory():
     login_manager = LoginManager()
     login_manager.init_app(app)
 
-    with app.app_context():
-        seed_data = SeedDataService()
-        seed_data.seed()
+    seed_data_enabled = config.get('SEED_DATA_ENABLED')
+    if seed_data_enabled:
+        with app.app_context():
+            seed_data = SeedDataService()
+            seed_data.seed()
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -66,7 +68,7 @@ def app_factory():
             if request.full_path in whitelist:
                 return
 
-            abort(401)
+            raise Unauthorized()
 
         header_value = header.split()
         auth_type = header_value[0].lower()

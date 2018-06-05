@@ -6,3 +6,4 @@ production:
   FLASK_USE_RELOADER: True
   FLASK_SESSION_SECRET_KEY: 'correct horse battery staple'
   AUDIT_REQUEST_BODIES: False
+  SEED_DATA_ENABLED: True

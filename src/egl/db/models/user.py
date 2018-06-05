@@ -10,6 +10,18 @@ from sqlalchemy import func
 from egl.db.base import Base
 
 
+def hash_password(password: str) -> str:
+    password = password or ''
+    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    return hashed.decode('utf-8')
+
+
+def check_password(password: str, hashed_password: str) -> bool:
+    password = password or ''
+    hashed_password = hashed_password or ''
+    return bcrypt.checkpw(password.encode('utf8'), hashed_password.encode('utf-8'))
+
+
 class User(Base, UserMixin):
     __tablename__ = 'users'
 
@@ -22,11 +34,7 @@ class User(Base, UserMixin):
     active = Column(Boolean, default=True, nullable=False, index=True)
 
     def change_password(self, password):
-        password = password or ''
-
-        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        self.password = hashed.decode('utf-8')
+        self.password = hash_password(password)
 
     def check_password(self, password):
-        password = password or ''
-        return bcrypt.checkpw(password.encode('utf8'), self.password.encode('utf-8'))
+        return check_password(password, self.password)
