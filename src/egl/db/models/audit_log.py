@@ -14,6 +14,7 @@ class AuditLog(Base):
     id = Column(UUID, default=uuid.uuid4, primary_key=True, nullable=False)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False, index=True)
     user_id = Column(UUID, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    user_email = Column(String, index=True, unique=False, nullable=False)
     action = Column(String, index=True, unique=False, nullable=True)
     description = Column(String, index=True, unique=False, nullable=True)
     meta = Column(JSON, default=MutableDict, nullable=True)

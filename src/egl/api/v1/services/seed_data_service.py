@@ -1,9 +1,9 @@
 import logging
 
 from egl.api.v1 import Auditable
-from egl.api.v1.defaults import Users, UserGroups, Permissions
-from egl.db.models import User, UserGroup, Permission
+from egl.db.models import User, Users, UserGroup, UserGroups, Permission, Permissions
 from egl.db.sessions import db
+from flask_login import current_user, login_user, logout_user
 
 
 class SeedDataService(Auditable):
@@ -12,9 +12,13 @@ class SeedDataService(Auditable):
         self.logger = logging.getLogger(__name__)
 
     def seed(self):
+        self.user = self.seed_user(Users.seed_service, audit=False)
+        db.session.commit()
+
         self.seed_user(Users.root)
         self.seed_user(Users.admin)
         self.seed_user(Users.minion)
+        self.seed_user(Users.guest)
 
         self.seed_group(UserGroups.superusers)
         self.seed_group(UserGroups.admins)
@@ -25,17 +29,19 @@ class SeedDataService(Auditable):
         self.seed_permission(Permissions.modify_users)
         self.seed_permission(Permissions.modify_user_groups)
         self.seed_permission(Permissions.modify_permissions)
-
         db.session.commit()
 
-    def seed_user(self, user: User) -> User:
+    def seed_user(self, user: User, audit=False) -> User:
         existing = db.session.query(User).get(user.id)
         if not existing:
             existing = db.session.query(User).filter(User.email == user.email).first()
             if not existing:
                 existing = user
                 db.session.add(existing)
+                if audit:
+                    db.session.add(self.audit_creation(db_model=User, entity=user))
                 self.logger.info('Adding user: {}'.format(existing))
+
 
         existing.email = user.email or existing.email
         existing.password = user.password or existing.password

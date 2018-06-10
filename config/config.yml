@@ -7,3 +7,10 @@ production:
   FLASK_SESSION_SECRET_KEY: 'correct horse battery staple'
   AUDIT_REQUEST_BODIES: False
   SEED_DATA_ENABLED: True
+
+  passwords:
+    seed: abc123    # override with secrets
+    root: abc123    # override with secrets
+    admin: abc123   # override with secrets
+    minion: abc123  # override with secrets
+    guest: abc123   # override with secrets

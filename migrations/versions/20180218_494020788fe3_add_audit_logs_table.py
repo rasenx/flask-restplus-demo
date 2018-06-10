@@ -23,6 +23,7 @@ def upgrade():
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=func.now(), nullable=False),
         sa.Column('id', UUID(), nullable=False, server_default=func.uuid_generate_v4()),
         sa.Column('user_id', UUID(), nullable=False),
+        sa.Column('user_email', sa.String(), nullable=False),
         sa.Column('action', sa.String(), nullable=False),
         sa.Column('description', sa.String(), nullable=True),
         sa.Column('meta', UUID(), nullable=True),

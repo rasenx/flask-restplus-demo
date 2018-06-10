@@ -32,6 +32,7 @@ def upgrade():
         sa.Column('password', sa.String(), nullable=True),
         sa.Column('meta', JSON(), nullable=True),
         sa.Column('active', sa.Boolean(), nullable=False),
+        sa.Column('is_system_user', sa.Boolean(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
     )
     op.create_index(op.f('ix_users_created_at'), 'users', ['created_at'], unique=False)
