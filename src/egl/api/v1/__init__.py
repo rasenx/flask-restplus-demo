@@ -43,6 +43,9 @@ class PagedResult:
 
 class Auditable:
 
+    def __init__(self):
+        self.user = None
+
     @property
     def has_request_context(self):
         if _request_ctx_stack is not None:
@@ -56,36 +59,37 @@ class Auditable:
         If an http request object is present, the current request will be logged.
         """
 
-        # user = db.session.query(User).get(current_user.get_id())
+        user = current_user or self.user
+        assert user
 
-        entity = AuditLog()
-        entity.user_id = current_user.id
-        entity.username = current_user.username
-        entity.action = action
-        entity.description = description
-        entity.meta = meta
+        audit_log_entry = AuditLog()
+        audit_log_entry.user_id = user.id
+        audit_log_entry.user_email = user.email
+        audit_log_entry.action = action
+        audit_log_entry.description = description
+        audit_log_entry.meta = meta
 
         try:
             if self.has_request_context:
-                entity.url = request.url
+                audit_log_entry.url = request.url
                 firstline = '{} {}'.format(request.method, request.url)
 
                 audit_request_bodies = config.get('AUDIT_REQUEST_BODIES')
                 if audit_request_bodies:
-                    entity.request = '{}\n{}\n{}'.format(firstline, request.headers, request.data)
+                    audit_log_entry.request = '{}\n{}\n{}'.format(firstline, request.headers, request.data)
                 else:
-                    entity.request = '{}\n{}'.format(firstline, request.headers)
+                    audit_log_entry.request = '{}\n{}'.format(firstline, request.headers)
 
             if log_message:
                 message = "Audit Log: User: '{}' {}. Meta: {}"
-                message = message.format(entity.username, entity.action, entity.meta)
+                message = message.format(audit_log_entry.user_email, audit_log_entry.action, audit_log_entry.meta)
 
                 logger.info(message)
 
         except Exception as e:
             logger.error(e)
 
-        return entity
+        return audit_log_entry
 
     def get_metadata(self, entity) -> dict:
         meta = {'id': str(entity.id)}
@@ -98,17 +102,17 @@ class Auditable:
 
         return meta
 
-    def audit_log_for_create(self, db_model, entity) -> AuditLog:
+    def audit_creation(self, db_model, entity) -> AuditLog:
         """Creates an audit log entry for a create operation."""
         metadata = self.get_metadata(entity)
         return self.audit('Created {}'.format(db_model.__name__), meta=metadata)
 
-    def audit_log_for_update(self, db_model, entity) -> AuditLog:
+    def audit_modification(self, db_model, entity) -> AuditLog:
         """Creates an audit log entry for an update operation."""
         metadata = self.get_metadata(entity)
         return self.audit('Updated {}'.format(db_model.__name__), meta=metadata)
 
-    def audit_log_for_delete(self, db_model, entity) -> AuditLog:
+    def audit_deletion(self, db_model, entity) -> AuditLog:
         """Creates an audit log entry for a delete operation."""
         metadata = self.get_metadata(entity)
         return self.audit('Deleted {}'.format(db_model.__name__), meta=metadata)

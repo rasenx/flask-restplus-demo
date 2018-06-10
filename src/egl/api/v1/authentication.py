@@ -7,7 +7,7 @@ from werkzeug.exceptions import Unauthorized
 
 from egl.api.v1 import Auditable
 from egl.api.v1.schemas import LoginSchema, UserSchema, CurrentUserSchema
-from egl.db.models import User
+from egl.db.models.user import User
 from egl.db.sessions import db
 
 ns = Namespace('Authentication')

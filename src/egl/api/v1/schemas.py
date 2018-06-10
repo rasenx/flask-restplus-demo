@@ -1,7 +1,7 @@
 from flask_restplus_patched import Parameters, ModelSchema
 from marshmallow import fields, post_load
 
-from egl.db.models import User
+from egl.db.models.user import User
 
 
 ###############################################################################

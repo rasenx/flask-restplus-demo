@@ -9,10 +9,10 @@ class UserService(Auditable):
         return db.session.query(User).paginate(page, per_page, False)
 
     def create(self, dto):
-        pass
+        raise NotImplemented()
 
     def update(self, dto):
-        pass
+        raise NotImplemented()
 
     def delete(self, user_id):
-        pass
+        raise NotImplemented()
