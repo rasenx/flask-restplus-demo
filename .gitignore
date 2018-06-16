@@ -1,3 +1,6 @@
 /venv
-/.idea
+.idea
+.vscode
+.python-version
 __pycache__
+

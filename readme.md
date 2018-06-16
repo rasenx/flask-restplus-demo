@@ -50,6 +50,9 @@ echo "$(pwd)/src" > venv/lib/python3.6/site-packages/MY_VENV_PYTHONPATH.pth
 # activate the virtual environment
 . venv/bin/activate
 
+# upgrade pip
+pip install --upgrade pip
+
 # install requirements
 pip install -r requirements.txt
 
